@@ -50,6 +50,7 @@
   </div>
 </div>
 <script>
+  // We'll overwrite the email field. Ignoring the other fields for now
   const testCredential = {
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
@@ -66,17 +67,6 @@
       }
   };
 
-
-  const testPresentation = {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-    ],
-    "type": "VerifiablePresentation",
-    "verifiableCredential": [
-      testCredential
-    ]
-  };
   // ^ Note that:
   // 1. The Verifiable Credential is unsigned, and wrapped in a VerifiablePresentation.
   // 2. The wrapping VerifiablePresentation is not signed.
@@ -108,7 +98,7 @@
         'credential_type',
         'https://example.org/examples#UniversityDegreeCredential');
       searchParams.set('pre-authorized_code', 'not_real_12345');
-      searchParams.set('fake', JSON.stringify(testPresentation));
+      searchParams.set('fake', JSON.stringify(presentation));
       oid4vcUrl = `openid-initiate-issuance://?${searchParams}`;
     }
     console.log('oid4vcUrl', oid4vcUrl);
@@ -117,7 +107,7 @@
     let vcapiUrl;
     {
       const searchParams = new URLSearchParams();
-      searchParams.set('fakevp', JSON.stringify(testPresentation));
+      searchParams.set('fakevp', JSON.stringify(presentation));
       vcapiUrl = 'https://vcapi.example/exchangers/z123/exchanges/z456?' +
         searchParams;
     }
@@ -126,7 +116,7 @@
     // construct the WebCredential wrapper around the credential to be stored
     const credentialType = 'VerifiablePresentation';
     const webCredentialWrapper = new WebCredential(
-      credentialType, testPresentation, {
+      credentialType, presentation, {
         recommendedHandlerOrigins: [
           'https://wallet.example.chapi.io/'
         ],
