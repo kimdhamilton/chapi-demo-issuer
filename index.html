@@ -31,6 +31,11 @@
       (using CHAPI's <code>store()</code> under the hood).
     </p>
 
+    <p>Input your email address to receive an Email Address Verifiable Credential:</p>
+
+    <label for="emailAddress">Email Address:</label>
+    <input type="text" id="emailAddress" name="emailAddress">
+
     <p>When you click the Store() button, a Verifiable Credential will
       be issued and sent to your digital wallet for storage.
     </p>
@@ -51,27 +56,16 @@
         "https://www.w3.org/2018/credentials/examples/v1"
       ],
       "id": "http://example.edu/credentials/1872",
-      "type": ["VerifiableCredential", "UniversityDegreeCredential"],
-      "issuer": "https://example.edu/issuers/565049",
+      "description": "A self-attested email credential",
+      "type": ["VerifiableCredential", "EmailCredential"],
+      "issuer": "https://example.org/issuers/123",
       "issuanceDate": "2010-01-01T19:53:24Z",
       "credentialSubject": {
-        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-        "alumniOf": {
-          "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
-          "name": {
-            "@value": "Example University",
-            "@language": "en"
-          }
-        }
-      },
-      "proof": {
-        "type": "Ed25519Signature2018",
-        "created": "2017-06-18T21:19:10Z",
-        "proofPurpose": "assertionMethod",
-        "verificationMethod": "https://example.edu/issuers/keys/1",
-        "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5XsITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUcX16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtjPAYuNzVBAh4vGHSrQyHUdBBPM"
+        "id": "did:example:456",
+        "email": "test@email.com"
       }
   };
+
 
   const testPresentation = {
     "@context": [
@@ -84,11 +78,26 @@
     ]
   };
   // ^ Note that:
-  // 1. The Verifiable Credential is signed, and wrapped in a VerifiablePresentation.
+  // 1. The Verifiable Credential is unsigned, and wrapped in a VerifiablePresentation.
   // 2. The wrapping VerifiablePresentation is not signed.
 
   async function onClickReceive() {
     // document.getElementById('storeResults').innerHTML = ''; // clear results
+
+    let emailAddress = document.getElementById('emailAddress').value;
+    let credential = JSON.parse(JSON.stringify(testCredential));
+    credential.credentialSubject.email = emailAddress;
+
+    let presentation = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
+    ],
+    "type": "VerifiablePresentation",
+    "verifiableCredential": [
+      credential
+    ]
+  }
 
     // fake OID4VC URL
     let oid4vcUrl;
